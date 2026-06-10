@@ -1,0 +1,576 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="color-scheme" content="light dark">
+    <title>Aveya</title>
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2220%22 fill=%22black%22/><text x=%2250%%22 y=%2250%%22 dominant-baseline=%22central%22 text-anchor=%22middle%22 font-size=%2275%22 font-weight=%22900%22 font-family=%22sans-serif%22 fill=%22white%22>A</text></svg>">
+
+    <style>
+        /* --- LOCAL FONT CONFIGURATION (Self-Hosted) --- */
+        @font-face {
+            font-family: 'Inter';
+            font-style: normal;
+            font-weight: 400;
+            font-display: swap;
+            src: url('inter-v20-latin-regular.woff2') format('woff2');
+        }
+        
+        @font-face {
+            font-family: 'Inter';
+            font-style: normal;
+            font-weight: 900;
+            font-display: swap;
+            src: url('inter-v20-latin-900.woff2') format('woff2');
+        }
+
+        /* --- VARIABLES & RESETS --- */
+        :root {
+            --bg-fallback: #4b8eb8; 
+            --text-main: #ffffff; 
+            --accent-gold: #FFD700; 
+            --loader-green: #2ecc71;
+            --terminal-width: clamp(500px, 85vw, 750px);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+
+        html {
+            height: 100%;
+        }
+
+        html, body {
+            width: 100%;
+            overflow-x: hidden; 
+        }
+
+        body {
+            background: linear-gradient(0deg, var(--bg-fallback) 0%, #8dbcdb 100%) fixed;
+            color: var(--text-main);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100%;
+            padding: 60px 20px 40px; 
+        }
+
+        /* --- PRELOADER --- */
+        #preloader {
+            position: fixed;
+            inset: 0;
+            background-color: #0d2638;
+            z-index: 9999;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: opacity 0.5s ease, visibility 0.5s ease;
+        }
+
+        .progress-ring { width: 80px; height: 80px; }
+        .progress-ring circle { fill: transparent; stroke-width: 8; }
+        .progress-ring__track { stroke: rgba(255, 255, 255, 0.1); }
+          
+        .progress-ring__fill {
+            stroke: var(--loader-green);
+            stroke-dasharray: 226.19;
+            stroke-dashoffset: 226.19;
+            stroke-linecap: round;
+            transform: rotate(-90deg);
+            transform-origin: 50% 50%;
+            animation: fillUp 2s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+        }
+
+        @keyframes fillUp { to { stroke-dashoffset: 0; } }
+        .loader-hidden { opacity: 0; visibility: hidden; }
+
+        @media (prefers-reduced-motion: reduce) {
+            body, .logo, .progress-ring__fill, .contact-trigger, #cursor {
+                animation: none !important;
+                transform: none !important;
+            }
+            .progress-ring__fill { stroke-dashoffset: 0; }
+            #cursor::after { background-color: var(--accent-gold) !important; }
+        }
+
+        /* --- MAIN LAYOUT --- */
+        .main-content {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            flex-grow: 1;
+            width: var(--terminal-width);
+            aspect-ratio: 4 / 3; 
+            max-height: 65vh;
+            margin: auto 0;
+            position: relative;
+        }
+
+        .logo-container {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            z-index: 5;
+            width: 100%;
+            margin-bottom: calc(var(--terminal-width) * 0.06); 
+            height: calc(var(--terminal-width) * 0.13); 
+        }
+
+        .logo {
+            font-family: 'Inter', sans-serif;
+            font-size: calc(var(--terminal-width) * 0.13);
+            font-weight: 900;
+            text-transform: uppercase;
+            line-height: 1;
+            letter-spacing: calc(var(--terminal-width) * 0.02); 
+            margin-right: calc(var(--terminal-width) * -0.02); 
+            color: var(--text-main);
+            display: flex;
+            align-items: baseline;
+            justify-content: center;
+        }
+
+        .logo-mark {
+            color: var(--accent-gold);
+            text-transform: uppercase;
+            display: inline-block;
+        }
+
+        /* --- INFO STATEMENT --- */
+        .info-container {
+            text-align: center;
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: calc(var(--terminal-width) * 0.12);
+        }
+
+        .dynamic-statement {
+            font-family: ui-monospace, SFMono-Regular, SF Mono, Menlo, Consolas, "Liberation Mono", monospace;
+            font-weight: 900;
+            font-size: calc(var(--terminal-width) * 0.032); 
+            letter-spacing: calc(var(--terminal-width) * 0.007);
+            text-transform: uppercase;
+            line-height: 1.8; 
+            width: 100%;
+            text-align: center;
+            padding-left: calc(var(--terminal-width) * 0.007); 
+        }
+
+        .dynamic-statement .phrase-block {
+            display: inline-block;
+            white-space: nowrap;
+        }
+
+        .dynamic-statement .phrase-block:first-child {
+            margin-right: 1ch;
+        }
+
+        /* --- CHARACTER SLOTS & CURSOR --- */
+        .shuffle-char {
+            display: inline-block;
+            text-align: center;
+            width: 1ch; 
+            font-weight: 900;
+        }
+
+        .shuffle-char[data-space="true"] {
+            width: 1ch; 
+        }
+
+        .typing-hidden {
+            opacity: 0;
+            visibility: hidden;
+        }
+
+        /* --- DETERMINISTIC RHYTHMIC CURSOR --- */
+        #cursor {
+            display: inline-block;
+            width: 0; 
+            height: 0.9em; 
+            vertical-align: baseline; 
+            position: relative;
+            z-index: 2;
+        }
+
+        #cursor::after {
+            content: '';
+            position: absolute;
+            left: 2px;
+            top: 0.06em;
+            width: 1.1ch;
+            height: 100%;
+            background-color: transparent;
+        }
+
+        /* State 1: Blink exactly 4 times at start, then stay solid */
+        #cursor[data-state="start-blinking"]::after {
+            animation: startBlink 2.4s step-end forwards;
+        }
+
+        /* State 2: Solid cursor during active typing tracking */
+        #cursor[data-state="typing"]::after {
+            background-color: var(--accent-gold);
+        }
+
+        /* State 3: Reset clock, blink exactly 4 times at end, then rest transparently */
+        #cursor[data-state="end-blinking"]::after {
+            animation: endBlink 2.4s step-end forwards;
+        }
+
+        @keyframes startBlink {
+            0%, 25%, 50%, 75% { background-color: var(--accent-gold); }
+            12.5%, 37.5%, 62.5%, 87.5% { background-color: transparent; }
+            100% { background-color: var(--accent-gold); }
+        }
+
+        @keyframes endBlink {
+            0%, 25%, 50%, 75% { background-color: var(--accent-gold); }
+            12.5%, 37.5%, 62.5%, 87.5% { background-color: transparent; }
+            100% { background-color: transparent; }
+        }
+
+        /* --- SITE FOOTER --- */
+        .site-footer {
+            width: 100%;
+            max-width: 750px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 24px;
+            padding: 30px 0 10px; 
+            z-index: 10;
+            margin-top: auto;
+        }
+
+        .contact-trigger {
+            display: inline-block;
+            font-family: 'Inter', sans-serif;
+            font-weight: 900;
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: 5px;
+            color: var(--text-main);
+            text-decoration: none;
+            padding: 10px 28px 10px 33px; 
+            position: relative;
+            cursor: pointer;
+            transition: all 0.3s ease-in-out;
+        }
+
+        .contact-trigger:hover {
+            letter-spacing: 7px; 
+            padding-left: 35px; 
+        }
+
+        .contact-trigger::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            width: 0;
+            height: 1px;
+            background: var(--text-main); 
+            transform: translateX(-50%);
+            opacity: 0;
+            transition: all 0.3s ease;
+        }
+
+        .contact-trigger:hover::after { width: 40px; opacity: 1; }
+
+        /* --- MOBILE LAYOUT REFIX --- */
+        @media (max-width: 768px) {
+            .main-content {
+                width: 100%;
+                aspect-ratio: auto; 
+                max-height: none;
+                padding: 120px 0 40px;
+                display: block; 
+            }
+
+            .logo-container {
+                margin-bottom: 40px;
+                height: 70px; 
+                display: flex;
+                justify-content: center;
+                align-items: center;
+            }
+
+            .logo {
+                font-size: clamp(3.2rem, 15vw, 5.2rem);
+                letter-spacing: 6px;
+                margin-right: -6px;
+                line-height: 70px;
+            }
+
+            .info-container {
+                min-height: auto;
+                display: block;
+                width: 100%;
+            }
+
+            .dynamic-statement {
+                font-size: clamp(18px, 5vw, 24px);
+                font-weight: 900;
+                letter-spacing: 4px;
+                padding-left: 4px;
+                line-height: 2.2;
+                
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+            }
+            
+            .dynamic-statement .phrase-block {
+                display: inline-block;
+                white-space: nowrap;
+                width: auto;
+                text-align: center;
+            }
+
+            .dynamic-statement .phrase-block:first-child {
+                margin-right: 0;
+            }
+            
+            #cursor::after {
+                width: 1.2ch; 
+            }
+        }
+
+        /* --- PRIVACY MODAL --- */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(13, 38, 56, 0.8);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            z-index: 10000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.4s ease, visibility 0.4s ease;
+            user-select: text;
+            -webkit-user-select: text;
+        }
+
+        .modal-overlay.is-open {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .modal-card {
+            background: #113249;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 40px;
+            border-radius: 16px;
+            width: 90vw;
+            max-width: 600px;
+            max-height: 80vh;
+            overflow-y: auto;
+            font-family: 'Inter', sans-serif;
+            position: relative;
+            transform: translateY(20px);
+            transition: transform 0.4s ease;
+        }
+
+        .modal-overlay.is-open .modal-card {
+            transform: translateY(0);
+        }
+
+        .modal-card h2 {
+            font-weight: 900;
+            font-size: 24px;
+            margin-bottom: 20px;
+            border-bottom: 2px solid var(--accent-gold);
+            padding-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .modal-card h3 {
+            font-weight: 900;
+            font-size: 16px;
+            margin: 20px 0 10px;
+            color: var(--accent-gold);
+        }
+
+        .modal-card p {
+            font-size: 14px;
+            line-height: 1.6;
+            margin-bottom: 12px;
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: transparent;
+            border: none;
+            color: var(--text-main);
+            font-size: 24px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="preloader">
+        <svg class="progress-ring" viewBox="0 0 100 100">
+            <circle class="progress-ring__track" cx="50" cy="50" r="36"/>
+            <circle class="progress-ring__fill" cx="50" cy="50" r="36"/>
+        </svg>
+    </div>
+    
+    <div class="main-content">
+        <div class="logo-container">
+            <h1 class="logo" id="main-logo">Ave<span class="logo-mark">y</span>a</h1>
+        </div>
+
+        <div class="info-container">
+            <div class="dynamic-statement" id="statement-text">
+                <span class="phrase-block" data-target="Operating Across"></span><span class="phrase-block" data-target="Modern Horizons"></span>
+            </div>
+        </div>
+    </div>
+
+    <footer class="site-footer">
+        <a href="mailto:petr.lindqst@aveya.eu?subject=Inquiry%20via%20Aveya%20Web" class="contact-trigger">Contact</a>
+        <span id="privacy-open" class="contact-trigger">Privacy</span>
+    </footer>
+
+    <div id="privacy-modal" class="modal-overlay">
+        <div class="modal-card">
+            <button id="privacy-close" class="modal-close" aria-label="Close modal">&times;</button>
+            <h2>Privacy Policy</h2>
+            <p><strong>Last Updated:</strong> May 21, 2026</p>
+            <p>Aveya ("we," "our," or "us") operates the website <strong>aveya.eu</strong>. We are committed to handling your data in a transparent, compliant manner under the GDPR.</p>
+            <p>This website has been intentionally engineered to operate <strong>without the use of cookies, tracking pixels, or local storage</strong>.</p>
+            
+            <h3>1. Data We Process</h3>
+            <p><strong>Server Logs:</strong> When you visit, our hosting infrastructure automatically caches standard technical data to route traffic securely.</p>
+            <p><strong>Email Inquiries:</strong> If you use our contact link, we process your email strictly to answer your business inquiry.</p>
+            
+            <h3>2. Third Parties</h3>
+            <p>We do not sell or trade your data.</p>
+            
+            <h3>3. Your Rights</h3>
+            <p>Under the GDPR, you have the right to access, rectify, or request deletion of any email communications sent to us.</p>
+            
+            <h3>4. Contact</h3>
+            <p>Email: petr.lindqst@aveya.eu</p>
+        </div>
+    </div>
+
+    <script>
+        // Setup typing engine instantly when DOM structural framework node definitions load
+        document.addEventListener('DOMContentLoaded', () => {
+            setupLeftToRightWriter();
+        });
+
+        // Track lifecycle safely for preloader display mechanics
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                document.getElementById('preloader').classList.add('loader-hidden');
+            }, 2200); 
+        });
+
+        function initAppControls() {
+            // --- MODAL CONTROLS ---
+            const modal = document.getElementById('privacy-modal');
+            const openBtn = document.getElementById('privacy-open');
+            const closeBtn = document.getElementById('privacy-close');
+
+            openBtn.addEventListener('click', () => modal.classList.add('is-open'));
+            closeBtn.addEventListener('click', () => modal.classList.remove('is-open'));
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) modal.classList.remove('is-open');
+            });
+        }
+
+        // --- SYNCHRONIZED STABLE TYPING ENGINE ---
+        function setupLeftToRightWriter() {
+            const container = document.getElementById('statement-text');
+            Array.from(container.childNodes).forEach(n => n.nodeType === 3 && n.remove());
+
+            const blocks = Array.from(document.querySelectorAll('.phrase-block')).map((block) => {
+                const targetText = block.getAttribute('data-target');
+                block.textContent = ''; 
+                
+                const spans = Array.from(targetText).map((char) => {
+                    const span = document.createElement('span');
+                    span.className = 'shuffle-char typing-hidden';
+                    
+                    if (char === ' ') {
+                        span.textContent = '\u00A0'; 
+                        span.setAttribute('data-space', 'true');
+                    } else {
+                        span.textContent = char;
+                    }
+                    
+                    block.appendChild(span);
+                    return span;
+                });
+                return { element: block, spans };
+            });
+
+            const cursor = document.createElement('span');
+            cursor.id = 'cursor';
+            
+            if (blocks.length > 0 && blocks[0].spans.length > 0) {
+                blocks[0].element.insertBefore(cursor, blocks[0].spans[0]);
+            }
+
+            // Initialize structural modal buttons
+            initAppControls();
+
+            let blockIndex = 0, charIndex = 0;
+            const writingSpeed = 120; 
+            const startDelayDuration = 2400; // Exact match to CSS visual timeline loop definitions
+
+            cursor.setAttribute('data-state', 'start-blinking');
+
+            setTimeout(() => {
+                cursor.setAttribute('data-state', 'typing');
+
+                const interval = setInterval(() => {
+                    if (blockIndex >= blocks.length) {
+                        clearInterval(interval);
+                        cursor.setAttribute('data-state', 'end-blinking');
+                        return;
+                    }
+
+                    const currentBlock = blocks[blockIndex];
+                    const currentSpan = currentBlock.spans[charIndex];
+                    
+                    currentSpan.classList.remove('typing-hidden');
+                    currentSpan.after(cursor);
+
+                    charIndex++;
+
+                    if (charIndex >= currentBlock.spans.length) {
+                        blockIndex++;
+                        charIndex = 0;
+                        
+                        if (blockIndex < blocks.length && blocks[blockIndex].spans.length > 0) {
+                             blocks[blockIndex].element.insertBefore(cursor, blocks[blockIndex].spans[0]);
+                        }
+                    }
+                }, writingSpeed);
+
+            }, startDelayDuration); 
+        }
+    </script>
+</body>
+</html>
