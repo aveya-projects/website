@@ -8,7 +8,6 @@
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2220%22 fill=%22black%22/><text x=%2250%%22 y=%2250%%22 dominant-baseline=%22central%22 text-anchor=%22middle%22 font-size=%2275%22 font-weight=%22900%22 font-family=%22sans-serif%22 fill=%22white%22>A</text></svg>">
 
     <style>
-        /* --- LOCAL FONT CONFIGURATION (Self-Hosted) --- */
         @font-face {
             font-family: 'Inter';
             font-style: normal;
@@ -25,7 +24,6 @@
             src: url('inter-v20-latin-900.woff2') format('woff2');
         }
 
-        /* --- VARIABLES & RESETS --- */
         :root {
             --bg-fallback: #4b8eb8; 
             --text-main: #ffffff; 
@@ -61,7 +59,6 @@
             padding: 60px 20px 40px; 
         }
 
-        /* --- PRELOADER --- */
         #preloader {
             position: fixed;
             inset: 0;
@@ -76,7 +73,7 @@
         .progress-ring { width: 80px; height: 80px; }
         .progress-ring circle { fill: transparent; stroke-width: 8; }
         .progress-ring__track { stroke: rgba(255, 255, 255, 0.1); }
-          
+        
         .progress-ring__fill {
             stroke: var(--loader-green);
             stroke-dasharray: 226.19;
@@ -91,15 +88,13 @@
         .loader-hidden { opacity: 0; visibility: hidden; }
 
         @media (prefers-reduced-motion: reduce) {
-            body, .logo, .progress-ring__fill, .contact-trigger, #cursor {
+            body, .logo, .progress-ring__fill, .contact-trigger {
                 animation: none !important;
                 transform: none !important;
             }
             .progress-ring__fill { stroke-dashoffset: 0; }
-            #cursor::after { background-color: var(--accent-gold) !important; }
         }
 
-        /* --- MAIN LAYOUT --- */
         .main-content {
             display: flex;
             flex-direction: column;
@@ -120,7 +115,6 @@
             align-items: center;
             z-index: 5;
             width: 100%;
-            margin-bottom: calc(var(--terminal-width) * 0.06); 
             height: calc(var(--terminal-width) * 0.13); 
         }
 
@@ -144,102 +138,6 @@
             display: inline-block;
         }
 
-        /* --- INFO STATEMENT --- */
-        .info-container {
-            text-align: center;
-            width: 100%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            min-height: calc(var(--terminal-width) * 0.12);
-        }
-
-        .dynamic-statement {
-            font-family: ui-monospace, SFMono-Regular, SF Mono, Menlo, Consolas, "Liberation Mono", monospace;
-            font-weight: 900;
-            font-size: calc(var(--terminal-width) * 0.032); 
-            letter-spacing: calc(var(--terminal-width) * 0.007);
-            text-transform: uppercase;
-            line-height: 1.8; 
-            width: 100%;
-            text-align: center;
-            padding-left: calc(var(--terminal-width) * 0.007); 
-        }
-
-        .dynamic-statement .phrase-block {
-            display: inline-block;
-            white-space: nowrap;
-        }
-
-        .dynamic-statement .phrase-block:first-child {
-            margin-right: 1ch;
-        }
-
-        /* --- CHARACTER SLOTS & CURSOR --- */
-        .shuffle-char {
-            display: inline-block;
-            text-align: center;
-            width: 1ch; 
-            font-weight: 900;
-        }
-
-        .shuffle-char[data-space="true"] {
-            width: 1ch; 
-        }
-
-        .typing-hidden {
-            opacity: 0;
-            visibility: hidden;
-        }
-
-        /* --- DETERMINISTIC RHYTHMIC CURSOR --- */
-        #cursor {
-            display: inline-block;
-            width: 0; 
-            height: 0.9em; 
-            vertical-align: baseline; 
-            position: relative;
-            z-index: 2;
-        }
-
-        #cursor::after {
-            content: '';
-            position: absolute;
-            left: 2px;
-            top: 0.06em;
-            width: 1.1ch;
-            height: 100%;
-            background-color: transparent;
-        }
-
-        /* State 1: Blink exactly 4 times at start, then stay solid */
-        #cursor[data-state="start-blinking"]::after {
-            animation: startBlink 2.4s step-end forwards;
-        }
-
-        /* State 2: Solid cursor during active typing tracking */
-        #cursor[data-state="typing"]::after {
-            background-color: var(--accent-gold);
-        }
-
-        /* State 3: Reset clock, blink exactly 4 times at end, then rest transparently */
-        #cursor[data-state="end-blinking"]::after {
-            animation: endBlink 2.4s step-end forwards;
-        }
-
-        @keyframes startBlink {
-            0%, 25%, 50%, 75% { background-color: var(--accent-gold); }
-            12.5%, 37.5%, 62.5%, 87.5% { background-color: transparent; }
-            100% { background-color: var(--accent-gold); }
-        }
-
-        @keyframes endBlink {
-            0%, 25%, 50%, 75% { background-color: var(--accent-gold); }
-            12.5%, 37.5%, 62.5%, 87.5% { background-color: transparent; }
-            100% { background-color: transparent; }
-        }
-
-        /* --- SITE FOOTER --- */
         .site-footer {
             width: 100%;
             max-width: 750px;
@@ -287,7 +185,6 @@
 
         .contact-trigger:hover::after { width: 40px; opacity: 1; }
 
-        /* --- MOBILE LAYOUT REFIX --- */
         @media (max-width: 768px) {
             .main-content {
                 width: 100%;
@@ -311,43 +208,8 @@
                 margin-right: -6px;
                 line-height: 70px;
             }
-
-            .info-container {
-                min-height: auto;
-                display: block;
-                width: 100%;
-            }
-
-            .dynamic-statement {
-                font-size: clamp(18px, 5vw, 24px);
-                font-weight: 900;
-                letter-spacing: 4px;
-                padding-left: 4px;
-                line-height: 2.2;
-                
-                display: flex;
-                flex-direction: column;
-                align-items: center;
-                justify-content: center;
-            }
-            
-            .dynamic-statement .phrase-block {
-                display: inline-block;
-                white-space: nowrap;
-                width: auto;
-                text-align: center;
-            }
-
-            .dynamic-statement .phrase-block:first-child {
-                margin-right: 0;
-            }
-            
-            #cursor::after {
-                width: 1.2ch; 
-            }
         }
 
-        /* --- PRIVACY MODAL --- */
         .modal-overlay {
             position: fixed;
             inset: 0;
@@ -437,12 +299,6 @@
         <div class="logo-container">
             <h1 class="logo" id="main-logo">Ave<span class="logo-mark">y</span>a</h1>
         </div>
-
-        <div class="info-container">
-            <div class="dynamic-statement" id="statement-text">
-                <span class="phrase-block" data-target="Operating Across"></span><span class="phrase-block" data-target="Modern Horizons"></span>
-            </div>
-        </div>
     </div>
 
     <footer class="site-footer">
@@ -474,9 +330,9 @@
     </div>
 
     <script>
-        // Setup typing engine instantly when DOM structural framework node definitions load
+        // Setup app controls instantly when DOM structural framework node definitions load
         document.addEventListener('DOMContentLoaded', () => {
-            setupLeftToRightWriter();
+            initAppControls();
         });
 
         // Track lifecycle safely for preloader display mechanics
@@ -497,79 +353,6 @@
             modal.addEventListener('click', (e) => {
                 if (e.target === modal) modal.classList.remove('is-open');
             });
-        }
-
-        // --- SYNCHRONIZED STABLE TYPING ENGINE ---
-        function setupLeftToRightWriter() {
-            const container = document.getElementById('statement-text');
-            Array.from(container.childNodes).forEach(n => n.nodeType === 3 && n.remove());
-
-            const blocks = Array.from(document.querySelectorAll('.phrase-block')).map((block) => {
-                const targetText = block.getAttribute('data-target');
-                block.textContent = ''; 
-                
-                const spans = Array.from(targetText).map((char) => {
-                    const span = document.createElement('span');
-                    span.className = 'shuffle-char typing-hidden';
-                    
-                    if (char === ' ') {
-                        span.textContent = '\u00A0'; 
-                        span.setAttribute('data-space', 'true');
-                    } else {
-                        span.textContent = char;
-                    }
-                    
-                    block.appendChild(span);
-                    return span;
-                });
-                return { element: block, spans };
-            });
-
-            const cursor = document.createElement('span');
-            cursor.id = 'cursor';
-            
-            if (blocks.length > 0 && blocks[0].spans.length > 0) {
-                blocks[0].element.insertBefore(cursor, blocks[0].spans[0]);
-            }
-
-            // Initialize structural modal buttons
-            initAppControls();
-
-            let blockIndex = 0, charIndex = 0;
-            const writingSpeed = 120; 
-            const startDelayDuration = 2400; // Exact match to CSS visual timeline loop definitions
-
-            cursor.setAttribute('data-state', 'start-blinking');
-
-            setTimeout(() => {
-                cursor.setAttribute('data-state', 'typing');
-
-                const interval = setInterval(() => {
-                    if (blockIndex >= blocks.length) {
-                        clearInterval(interval);
-                        cursor.setAttribute('data-state', 'end-blinking');
-                        return;
-                    }
-
-                    const currentBlock = blocks[blockIndex];
-                    const currentSpan = currentBlock.spans[charIndex];
-                    
-                    currentSpan.classList.remove('typing-hidden');
-                    currentSpan.after(cursor);
-
-                    charIndex++;
-
-                    if (charIndex >= currentBlock.spans.length) {
-                        blockIndex++;
-                        charIndex = 0;
-                        
-                        if (blockIndex < blocks.length && blocks[blockIndex].spans.length > 0) {
-                             blocks[blockIndex].element.insertBefore(cursor, blocks[blockIndex].spans[0]);
-                        }
-                    }
-                }, writingSpeed);
-
-            }, startDelayDuration); 
         }
     </script>
 </body>
